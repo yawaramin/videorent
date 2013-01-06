@@ -1,0 +1,17 @@
+videorent - A video rental app
+
+Videorent is based on an interesting few pieces of QBasic, Java and 
+Python code I wrote more than ten years ago to play with the 
+languages. It's now reincarnated as a C/GTK+/GLib application that I 
+want to develop with a layered, TDD approach. By layered I mean the 
+`business' functions first, then the GUI on top of that, etc.
+
+Videorent is very simple right now. It can't be used for anything 
+serious--hacking fun only.
+
+As such, I'm releasing it under the GNU GPL v2. See the LICENSE file 
+that comes with this project or refer to 
+http://www.gnu.org/licenses/gpl-2.0.html for more details.
+
+Yawar Amin <yawar.amin@gmail.com>
+OpenPGP: 0x12C86554
