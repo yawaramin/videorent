@@ -29,4 +29,4 @@ rental_new(
 void
 rental_free(gpointer mem);
 
-#endif /* RENTAL_H */
+#endif // RENTAL_H

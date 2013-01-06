@@ -22,7 +22,8 @@ rental_new(
   return r;
 }
 
-void rental_free(gpointer mem) {
+void
+rental_free(gpointer mem) {
   rental* r = (rental*)mem;
   
   g_date_time_unref(r->r_date);
