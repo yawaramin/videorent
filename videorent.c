@@ -142,8 +142,7 @@ rental_get_from_id(guint rental_id) {
 }
 
 /*
-videorent_rental_get_overdue - whether, as of right now, this rental is
-overdue
+rental_get_overdue - whether, as of right now, this rental is overdue
 */
 gboolean
 rental_get_overdue(const rental* const r) {
