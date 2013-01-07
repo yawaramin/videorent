@@ -147,6 +147,7 @@ videorent_return(guint rental_id) {
     r->r_open = FALSE;
     if (videorent_get_rental_overdue(r->r_id)) v->v_count_overdue--;
     else v->v_count_rented--;
+    v->v_count_in++;
     returned = TRUE;
   }
 

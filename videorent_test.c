@@ -69,6 +69,27 @@ void test_videorent_not_return(gpointer fixture, gconstpointer user_data) {
   g_assert(!videorent_return(0));
 }
 
+/*
+Shouldn't be able to return a video twice after renting it
+*/
+void test_videorent_not_return_twice(gpointer fixture, gconstpointer user_data) {
+  videorent_rent(0, 0);
+  videorent_return(0);
+  g_assert(!videorent_return(0));
+}
+
+/*
+Should be able to rent a video after returning it so that at least one
+copy is in stock
+*/
+void test_videorent_rent_after_returning(gpointer fixture, gconstpointer user_data) {
+  videorent_rent(0, 0);
+  videorent_rent(0, 0);
+  videorent_rent(0, 0);
+  videorent_return(0);
+  g_assert(videorent_rent(0, 0));
+}
+
 int main(int argc, char* argv[]) {
   g_test_init(&argc, &argv, NULL);
 
@@ -81,6 +102,7 @@ int main(int argc, char* argv[]) {
   g_test_add("/videorent/not_rent", void, NULL, setup, test_videorent_not_rent, teardown);
   g_test_add("/videorent/return", void, NULL, setup, test_videorent_return, teardown);
   g_test_add("/videorent/not_return", void, NULL, setup, test_videorent_not_return, teardown);
+  g_test_add("/videorent/rent_after_returning", void, NULL, setup, test_videorent_rent_after_returning, teardown);
 
   return g_test_run();
 }
