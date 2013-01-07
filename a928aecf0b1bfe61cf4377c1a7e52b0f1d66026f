@@ -1,0 +1,8 @@
+Overdue-video tracking is actually fine
+
+I just realised that I actually have set up overdue-video tracking
+correctly. The determination of whether a video is overdue or not is
+made by the rental object itself. The overdue count in the video object
+is just for quick reference purposes. So, if we actually need to see
+whether a rental is overdue or not, we are definitely getting that
+accurately right now from the rental_get_overdue function.
