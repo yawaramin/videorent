@@ -1,7 +1,7 @@
 #include "rental.h"
 
 rental*
-rental_new(
+videorent_rental_new(
   const guint video_id,
   const guint member_id,
   gfloat amount,
@@ -23,7 +23,7 @@ rental_new(
 }
 
 void
-rental_free(gpointer mem) {
+videorent_rental_free(gpointer mem) {
   rental* r = (rental*)mem;
   
   g_date_time_unref(r->r_date);

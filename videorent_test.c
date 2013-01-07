@@ -7,7 +7,7 @@ const gfloat rental_amt = 3.0;
 
 void
 setup(gpointer fixture, gconstpointer user_data) {
-  videorent_video_add(title, url, summary, rental_amt);
+  videorent_add_video(title, url, summary, rental_amt);
 }
 
 void
@@ -15,24 +15,24 @@ teardown(gpointer fixture, gconstpointer user_data) {
   videorent_exit();
 }
 
-void test_videorent_video_add(gpointer fixture, gconstpointer user_data) {
-  g_assert(videorent_video_get_title(0));
+void test_videorent_add_video(gpointer fixture, gconstpointer user_data) {
+  g_assert(videorent_get_video_title(0));
 }
 
 void test_videorent_video_title(gpointer fixture, gconstpointer user_data) {
-  g_assert_cmpstr(title, ==, videorent_video_get_title(0));
+  g_assert_cmpstr(title, ==, videorent_get_video_title(0));
 }
 
 void test_videorent_video_url(gpointer fixture, gconstpointer user_data) {
-  g_assert_cmpstr(url, ==, videorent_video_get_url(0));
+  g_assert_cmpstr(url, ==, videorent_get_video_url(0));
 }
 
 void test_videorent_video_summary(gpointer fixture, gconstpointer user_data) {
-  g_assert_cmpstr(summary, ==, videorent_video_get_summary(0));
+  g_assert_cmpstr(summary, ==, videorent_get_video_summary(0));
 }
 
 void test_videorent_video_rental_amt(gpointer fixture, gconstpointer user_data) {
-  g_assert_cmpfloat(rental_amt, ==, videorent_video_get_rental_amt(0));
+  g_assert_cmpfloat(rental_amt, ==, videorent_get_video_rental_amt(0));
 }
 
 /*
@@ -72,7 +72,7 @@ void test_videorent_not_return(gpointer fixture, gconstpointer user_data) {
 int main(int argc, char* argv[]) {
   g_test_init(&argc, &argv, NULL);
 
-  g_test_add("/videorent/video_add", void, NULL, setup, test_videorent_video_add, teardown);
+  g_test_add("/videorent/video_add", void, NULL, setup, test_videorent_add_video, teardown);
   g_test_add("/videorent/video_title", void, NULL, setup, test_videorent_video_title, teardown);
   g_test_add("/videorent/video_url", void, NULL, setup, test_videorent_video_url, teardown);
   g_test_add("/videorent/video_summary", void, NULL, setup, test_videorent_video_summary, teardown);

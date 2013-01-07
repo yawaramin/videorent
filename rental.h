@@ -13,7 +13,7 @@ typedef struct {
 } rental;
 
 rental*
-rental_new(
+videorent_rental_new(
   const guint video_id,
   const guint member_id,
   gfloat amount,
@@ -21,7 +21,7 @@ rental_new(
 );
 
 void
-rental_free(gpointer mem);
+videorent_rental_free(gpointer mem);
 
 gint
 videorent_rental_id_equals(gconstpointer item, gconstpointer v_id);

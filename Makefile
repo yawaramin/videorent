@@ -11,17 +11,20 @@ check : videorent_test
 clean :
 	$(foreach f,*.gch *.o videorent videorent_test,$(call RMFILE,$(f)))
 
-videorent : rental.o videorent.o
+videorent : video.o rental.o videorent.o
 	$(CC) -Wall -o videorent rental.o videorent.o $(GTK_LIBS)
 
-videorent_test : rental.o videorent.o videorent_test.o
-	$(CC) -Wall -o videorent_test rental.o videorent.o videorent_test.o $(GTK_LIBS)
+videorent_test : video.o rental.o videorent.o videorent_test.o
+	$(CC) -Wall -o videorent_test video.o rental.o videorent.o videorent_test.o $(GTK_LIBS)
 
-videorent_test.o : videorent.h rental.h videorent_test.c
-	$(CC) -Wall -c videorent.h rental.h videorent_test.c $(GTK_CFLAGS)
+videorent_test.o : videorent.h videorent_test.c
+	$(CC) -Wall -c videorent.h videorent_test.c $(GTK_CFLAGS)
+
+video.o : video.h video.c
+	$(CC) -Wall -c video.h video.c $(GTK_CFLAGS)
 
 rental.o : rental.h rental.c
 	$(CC) -Wall -c rental.h rental.c $(GTK_CFLAGS)
 
-videorent.o : rental.h videorent.h videorent.c
-	$(CC) -Wall -c rental.h videorent.h videorent.c $(GTK_CFLAGS)
+videorent.o : video.h rental.h videorent.h videorent.c
+	$(CC) -Wall -c video.h rental.h videorent.h videorent.c $(GTK_CFLAGS)
