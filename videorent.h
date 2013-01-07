@@ -40,4 +40,7 @@ videorent_rent(guint video_id, guint member_id);
 gboolean
 videorent_return(guint rental_id);
 
+void
+videorent_exit();
+
 #endif // VIDEORENT_H

@@ -2,19 +2,14 @@
 #define RENTAL_H
 #include <glib.h>
 
-typedef enum {
-  rental_open,
-  rental_overdue,
-  rental_closed
-} rental_status;
-
 typedef struct {
   guint r_id;
   GDateTime* r_date;
   guint v_id;
+  guint m_id;
   gfloat r_amt;
   gfloat r_discount;
-  rental_status r_status;
+  gboolean r_open; // Rental status is open (i.e. rented out) or closed
 } rental;
 
 rental*
@@ -22,11 +17,13 @@ rental_new(
   const guint video_id,
   const guint member_id,
   gfloat amount,
-  gfloat discount,
-  rental_status status
+  gfloat discount
 );
 
 void
 rental_free(gpointer mem);
+
+gint
+videorent_rental_id_equals(gconstpointer item, gconstpointer v_id);
 
 #endif // RENTAL_H

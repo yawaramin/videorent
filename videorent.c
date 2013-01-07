@@ -1,7 +1,7 @@
 #include "videorent.h"
 #include "rental.h"
 
-const guint rent_days = 7;
+const GTimeSpan rent_days = 7 * G_TIME_SPAN_DAY;
 // Member rental discount is 20%:
 const gfloat member_discount_factor = 0.8;
 const gint default_stock = 3;
@@ -41,6 +41,8 @@ video_new(
     v->v_summary = g_strdup(summary);
     v->v_rental_amt = rental_amt;
     v->v_count_in = default_stock;
+    v->v_count_rented = 0;
+    v->v_count_overdue = 0;
   }
   
   return v;
@@ -73,15 +75,15 @@ video_free(gpointer mem) {
 }
 
 gint
-video_id_equals(gconstpointer item, gconstpointer v_id) {
+videorent_video_id_equals(gconstpointer item, gconstpointer v_id) {
   video* v = (video*)item;
   guint* v_id_int = (guint*)v_id;
   return v->v_id == *v_id_int ? 0 : 1;
 }
 
-video*
+video* const
 video_get_from_id(guint video_id) {
-  GList* video_item = g_list_find_custom(videos, &video_id, video_id_equals);
+  GList* video_item = g_list_find_custom(videos, &video_id, videorent_video_id_equals);
   return (video_item ? (video*)video_item->data : NULL);
 }
 
@@ -133,6 +135,25 @@ videorent_video_set_rental_amt(guint video_id, const gfloat rental_amt) {
   if (v) v->v_rental_amt = rental_amt;
 }
 
+rental* const
+rental_get_from_id(guint rental_id) {
+  GList* rental_item = g_list_find_custom(rentals, &rental_id, videorent_rental_id_equals);
+  return (rental_item ? (rental*)rental_item->data : NULL);
+}
+
+/*
+videorent_rental_get_overdue - whether, as of right now, this rental is
+overdue
+*/
+gboolean
+rental_get_overdue(const rental* const r) {
+  GDateTime* now = g_date_time_new_now_local();
+  gboolean overdue = g_date_time_difference(now, r->r_date) > rent_days;
+
+  g_date_time_unref(now);
+  return overdue;
+}
+
 /*
 videorent_rent - Rent a video
 
@@ -152,7 +173,7 @@ videorent_rent(guint video_id, guint member_id) {
   gfloat discount = 0.0;
   if (member_id > 0) discount = amount * member_discount_factor;  
 
-  rental* r = rental_new(video_id, member_id, amount, discount, rental_open);
+  rental* r = rental_new(video_id, member_id, amount, discount);
   if (r) {
     if (rentals)
       r->r_id = ((rental*)(g_list_last(rentals)->data))->r_id + 1;
@@ -168,10 +189,22 @@ videorent_rent_end:
 
 gboolean
 videorent_return(guint rental_id) {
-  return FALSE;
+  gboolean returned = FALSE;
+  rental* r = rental_get_from_id(rental_id); if (!r) goto videorent_return_end;
+  video* v = video_get_from_id(r->v_id); if (!v) goto videorent_return_end;
+
+  if (v->v_count_rented > 0 || v->v_count_overdue > 0) {
+    r->r_open = FALSE;
+    if (rental_get_overdue(r)) v->v_count_overdue--;
+    else v->v_count_rented--;
+    returned = TRUE;
+  }
+
+videorent_return_end:
+  return returned;
 }
 
 void videorent_exit() {
-  g_list_free_full(videos, video_free);
-  g_list_free_full(rentals, rental_free);
+  g_list_free_full(videos, video_free); videos = NULL;
+  g_list_free_full(rentals, rental_free); rentals = NULL;
 }

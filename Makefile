@@ -1,4 +1,4 @@
-CC=gcc
+CC=gcc -g
 GTK_LIBS=`pkg-config --libs gtk+-2.0`
 GTK_CFLAGS=`pkg-config --cflags gtk+-2.0`
 RMFILE=rm $1;

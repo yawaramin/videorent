@@ -5,28 +5,33 @@ const gchar* const url = "http://www.imdb.com/title/tt0064116/";
 const gchar* const summary = "Epic story of a mysterious stranger with a harmonica who joins forces with a notorious desperado to protect a beautiful widow from a ruthless assassin working for the railroad.";
 const gfloat rental_amt = 3.0;
 
-void test_videorent_video_add(void) {
+void
+setup(gpointer fixture, gconstpointer user_data) {
   videorent_video_add(title, url, summary, rental_amt);
+}
+
+void
+teardown(gpointer fixture, gconstpointer user_data) {
+  videorent_exit();
+}
+
+void test_videorent_video_add(gpointer fixture, gconstpointer user_data) {
   g_assert(videorent_video_get_title(0));
 }
 
-void test_videorent_video_title(void) {
-  videorent_video_add(title, url, summary, rental_amt);
+void test_videorent_video_title(gpointer fixture, gconstpointer user_data) {
   g_assert_cmpstr(title, ==, videorent_video_get_title(0));
 }
 
-void test_videorent_video_url(void) {
-  videorent_video_add(title, url, summary, rental_amt);
+void test_videorent_video_url(gpointer fixture, gconstpointer user_data) {
   g_assert_cmpstr(url, ==, videorent_video_get_url(0));
 }
 
-void test_videorent_video_summary(void) {
-  videorent_video_add(title, url, summary, rental_amt);
+void test_videorent_video_summary(gpointer fixture, gconstpointer user_data) {
   g_assert_cmpstr(summary, ==, videorent_video_get_summary(0));
 }
 
-void test_videorent_video_rental_amt(void) {
-  videorent_video_add(title, url, summary, rental_amt);
+void test_videorent_video_rental_amt(gpointer fixture, gconstpointer user_data) {
   g_assert_cmpfloat(rental_amt, ==, videorent_video_get_rental_amt(0));
 }
 
@@ -35,8 +40,7 @@ Test that a video that's just added to the catalogue--and therefore
 which should have a default of 3 copies in stock--was successfully
 rented
 */
-void test_videorent_rent(void) {
-  videorent_video_add(title, url, summary, rental_amt);
+void test_videorent_rent(gpointer fixture, gconstpointer user_data) {
   g_assert(videorent_rent(0, 0));
 }
 
@@ -45,22 +49,38 @@ Test that a video that's just added to the catalogue--and therefore
 which should have a default of 3 copies in stock--should not rent more
 than 3 times
 */
-void test_videorent_not_rent(void) {
-  videorent_video_add(title, url, summary, rental_amt);
+void test_videorent_not_rent(gpointer fixture, gconstpointer user_data) {
   videorent_rent(0, 0);
   videorent_rent(0, 0);
   videorent_rent(0, 0);
   g_assert(!videorent_rent(0, 0));
 }
 
+void test_videorent_return(gpointer fixture, gconstpointer user_data) {
+  videorent_rent(0, 0);
+  g_assert(videorent_return(0));
+}
+
+/*
+If we create a video but don't rent it, we shouldn't be able to return
+it
+*/
+void test_videorent_not_return(gpointer fixture, gconstpointer user_data) {
+  g_assert(!videorent_return(0));
+}
+
 int main(int argc, char* argv[]) {
   g_test_init(&argc, &argv, NULL);
-  g_test_add_func("/videorent/video_add", test_videorent_video_add);
-  g_test_add_func("/videorent/video_title", test_videorent_video_title);
-  g_test_add_func("/videorent/video_url", test_videorent_video_url);
-  g_test_add_func("/videorent/video_summary", test_videorent_video_summary);
-  g_test_add_func("/videorent/video_rental_amt", test_videorent_video_rental_amt);
-  g_test_add_func("/videorent/rent", test_videorent_rent);
-  g_test_add_func("/videorent/not_rent", test_videorent_not_rent);
+
+  g_test_add("/videorent/video_add", void, NULL, setup, test_videorent_video_add, teardown);
+  g_test_add("/videorent/video_title", void, NULL, setup, test_videorent_video_title, teardown);
+  g_test_add("/videorent/video_url", void, NULL, setup, test_videorent_video_url, teardown);
+  g_test_add("/videorent/video_summary", void, NULL, setup, test_videorent_video_summary, teardown);
+  g_test_add("/videorent/video_rental_amt", void, NULL, setup, test_videorent_video_rental_amt, teardown);
+  g_test_add("/videorent/rent", void, NULL, setup, test_videorent_rent, teardown);
+  g_test_add("/videorent/not_rent", void, NULL, setup, test_videorent_not_rent, teardown);
+  g_test_add("/videorent/return", void, NULL, setup, test_videorent_return, teardown);
+  g_test_add("/videorent/not_return", void, NULL, setup, test_videorent_not_return, teardown);
+
   return g_test_run();
 }
