@@ -20,10 +20,10 @@ init_video_list(GtkWidget* list) {
   };
 
   GtkTreeViewColumn* columns[N_COLUMNS] = {
-    gtk_tree_view_column_new_with_attributes("ID", renderers[0], "text", VIDEO_ID, NULL),
-    gtk_tree_view_column_new_with_attributes("Title", renderers[1], "text", VIDEO_TITLE, NULL),
-    gtk_tree_view_column_new_with_attributes("URL", renderers[2], "text", VIDEO_URL, NULL),
-    gtk_tree_view_column_new_with_attributes("Rental Rate", renderers[3], "text", VIDEO_RENTAL_AMT, NULL)
+    gtk_tree_view_column_new_with_attributes("ID", renderers[VIDEO_ID], "text", VIDEO_ID, NULL),
+    gtk_tree_view_column_new_with_attributes("Title", renderers[VIDEO_TITLE], "text", VIDEO_TITLE, NULL),
+    gtk_tree_view_column_new_with_attributes("URL", renderers[VIDEO_URL], "text", VIDEO_URL, NULL),
+    gtk_tree_view_column_new_with_attributes("Rental Rate", renderers[VIDEO_RENTAL_AMT], "text", VIDEO_RENTAL_AMT, NULL)
   };
 
   int col;
@@ -32,6 +32,8 @@ init_video_list(GtkWidget* list) {
     gtk_tree_view_column_set_clickable(GTK_TREE_VIEW_COLUMN(columns[col]), TRUE);
     gtk_tree_view_append_column(GTK_TREE_VIEW(list), columns[col]);
   }
+  gtk_tree_view_column_set_min_width(GTK_TREE_VIEW_COLUMN(columns[VIDEO_TITLE]), 400);
+  gtk_tree_view_column_set_min_width(GTK_TREE_VIEW_COLUMN(columns[VIDEO_URL]), 300);
 
   GtkListStore* list_videos = gtk_list_store_new(
     N_COLUMNS,
@@ -70,14 +72,44 @@ add_to_video_list(
 void
 init_ui_gtk(int* p_argc, char*** p_argv) {
   GtkWidget* window;
+  GtkWidget* vbox;
+  GtkWidget* menubar;
+  GtkWidget* menudrop_video;
+  GtkWidget* menu_video;
+  GtkWidget* menu_video_add;
+  GtkWidget* menu_video_sep;
+  GtkWidget* menu_video_quit;
   // This is the list view of videos
   GtkWidget* video_list;
+  GtkWidget* statusbar;
 
   gtk_init(p_argc, p_argv);
 
+  window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
+  gtk_window_set_default_size(GTK_WINDOW(window), 800, 600);
+  gtk_window_set_position(GTK_WINDOW(window), GTK_WIN_POS_CENTER);
+  gtk_window_set_title(GTK_WINDOW(window), "Videorent");
+
+  vbox = gtk_vbox_new(FALSE, 0);
+  gtk_container_add(GTK_CONTAINER(window), vbox);
+
+  menubar = gtk_menu_bar_new();
+
+  menudrop_video = gtk_menu_new();
+  menu_video = gtk_menu_item_new_with_mnemonic("_Video");
+  menu_video_add = gtk_menu_item_new_with_mnemonic("_Add...");
+  menu_video_sep = gtk_separator_menu_item_new();
+  menu_video_quit = gtk_image_menu_item_new_from_stock(GTK_STOCK_QUIT, NULL);
+  gtk_menu_item_set_submenu(GTK_MENU_ITEM(menu_video), menudrop_video);
+  gtk_menu_shell_append(GTK_MENU_SHELL(menudrop_video), menu_video_add);
+  gtk_menu_shell_append(GTK_MENU_SHELL(menudrop_video), menu_video_sep);
+  gtk_menu_shell_append(GTK_MENU_SHELL(menudrop_video), menu_video_quit);
+  gtk_menu_shell_append(GTK_MENU_SHELL(menubar), menu_video);
+
+  gtk_box_pack_start(GTK_BOX(vbox), menubar, FALSE, FALSE, 3);
+
   video_list = gtk_tree_view_new();
   init_video_list(video_list);
-
   // Example video:
   add_to_video_list(
     video_list,
@@ -86,16 +118,15 @@ init_ui_gtk(int* p_argc, char*** p_argv) {
     "http://www.imdb.com/title/tt0064116/",
     3.0
   );
-
   gtk_tree_view_columns_autosize(GTK_TREE_VIEW(video_list));
+  gtk_box_pack_start(GTK_BOX(vbox), video_list, FALSE, TRUE, 1);
 
-  window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
-  gtk_window_set_default_size(GTK_WINDOW(window), 800, 600);
-  gtk_window_set_position(GTK_WINDOW(window), GTK_WIN_POS_CENTER);
-  gtk_window_set_title(GTK_WINDOW(window), "Videorent");
-  gtk_container_add(GTK_CONTAINER(window), video_list);
+  statusbar = gtk_statusbar_new();
+  gtk_box_pack_end(GTK_BOX(vbox), statusbar, FALSE, TRUE, 1);
 
   g_signal_connect(window, "destroy", G_CALLBACK(gtk_main_quit), NULL);
+  g_signal_connect(G_OBJECT(menu_video_quit), "activate", G_CALLBACK(gtk_main_quit), NULL);
+
   gtk_widget_show_all(window);
 
   gtk_main();
